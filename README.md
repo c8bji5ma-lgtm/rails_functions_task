@@ -1,24 +1,58 @@
-# README
+# Rails Functions Task
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+ユーザー登録、ログイン、プロフィール表示、ログアウトを通して、Railsの基本的な認証機能を学ぶための教材用アプリケーションです。
 
-Things you may want to cover:
+## 動作環境
 
-* Ruby version
+- Ruby 4.0.5
+- Ruby on Rails 8.1.3
+- Bundler 4.0.16
+- PostgreSQL 18.4
+- Node.js 24.18.0 LTS (Krypton)
+- Yarn 1.22.22
 
-* System dependencies
+JavaScriptはShakapacker 10とWebpack 5で管理し、既存のTurbolinksとRails UJSを使用します。
 
-* Configuration
+## セットアップ
 
-* Database creation
+PostgreSQLを起動した後、次のコマンドを実行してください。
 
-* Database initialization
+```bash
+bundle install
+yarn install --frozen-lockfile
+bundle exec rails db:prepare
+bundle exec rails db:migrate:status
+```
 
-* How to run the test suite
+まとめてセットアップする場合は、次のコマンドも利用できます。
 
-* Services (job queues, cache servers, search engines, etc.)
+```bash
+bin/setup
+```
 
-* Deployment instructions
+## 起動
 
-* ...
+```bash
+bundle exec rails server
+```
+
+ブラウザで `http://localhost:3000/users/new` または `http://localhost:3000/sessions/new` を開いてください。
+
+## テストと検証
+
+```bash
+bundle exec rails test
+bundle exec rails zeitwerk:check
+bundle exec rails routes
+RAILS_ENV=test NODE_ENV=production bundle exec bin/shakapacker
+```
+
+RSpec評価コードが配置されている環境では、次のコマンドも実行します。
+
+```bash
+bundle exec rspec
+```
+
+## 環境変数
+
+ローカル開発では環境変数は必須ではありません。接続先を上書きする場合は `DATABASE_URL` を設定してください。本番環境ではDB設定に応じて `rails_functions_task_DATABASE_PASSWORD` を、暗号化credentialsを利用する場合は `RAILS_MASTER_KEY` を設定します。

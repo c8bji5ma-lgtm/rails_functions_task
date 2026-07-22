@@ -13,33 +13,50 @@ jobs:
 
     services:
       postgres:
-        image: postgres:12.1-alpine
+        image: postgres:18.4-alpine
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
       - name: install/imagemagick
         run: |
           sudo apt-get update
           sudo apt-get install -y imagemagick
-      - uses: actions/checkout@v2
       - name: Set up Ruby and Bundler
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 3.3.0
+          ruby-version: 4.0.5
           bundler-cache: true
       - name: Set up Node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v7
         with:
-          node-version: "18"
-      - name: Install Yarn
-        run: yarn --frozen-lockfile
+          node-version: "24.18.0"
+          cache: yarn
+      - name: Install JavaScript dependencies
+        run: |
+          corepack enable
+          yarn install --frozen-lockfile
+      - name: Compile JavaScript assets
+        env:
+          RAILS_ENV: "test"
+          NODE_ENV: "production"
+        run: bundle exec bin/shakapacker
+      - name: Run Rails tests
+        env:
+          RAILS_ENV: "test"
+          DATABASE_URL: "postgres://postgres@localhost:5432/rails_functions_task_test"
+        run: |
+          bundle exec rails db:prepare
+          bundle exec rails test
       - name: Create Evaluation File
         run: |
           rm -rf spec
           git clone https://github.com/diveintocode-corp/cdp_web_rails_functions_task_evaluation_code.git spec
+          sed -i 's/config.fixture_path =/config.fixture_paths =/' spec/rails_helper.rb
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
       - name: Create Feedback
