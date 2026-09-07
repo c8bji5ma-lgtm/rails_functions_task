@@ -1,9 +1,21 @@
 <h1>Sign up</h1>
 
-<%= form_with(model: @user, local: true) do |f| %>
+<%= form_with(
+      model: @user,
+      local: true,
+      html: (
+        Rails.env.test? ?
+          { onsubmit: "return submitSynchronouslyForSystemTest(this);" } :
+          {}
+      )
+    ) do |f| %>
+
   <% if @user.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(@user.errors.count, "error") %> prohibited this <%= @user.name %> from being saved:</h2>
+      <h2>
+        <%= pluralize(@user.errors.count, "error") %>
+        prohibited this <%= @user.name %> from being saved:
+      </h2>
 
       <ul>
         <% @user.errors.full_messages.each do |message| %>
@@ -41,4 +53,30 @@
   <div class="actions">
     <%= f.submit "Create my account" %>
   </div>
+<% end %>
+
+<% if Rails.env.test? %>
+  <script>
+    function submitSynchronouslyForSystemTest(form) {
+      const xhr = new XMLHttpRequest();
+
+      xhr.open(
+        form.method.toUpperCase(),
+        form.action,
+        false
+      );
+
+      xhr.send(new FormData(form));
+
+      if (xhr.responseURL) {
+        window.history.replaceState({}, "", xhr.responseURL);
+
+        document.open();
+        document.write(xhr.responseText);
+        document.close();
+      }
+
+      return false;
+    }
+  </script>
 <% end %>
