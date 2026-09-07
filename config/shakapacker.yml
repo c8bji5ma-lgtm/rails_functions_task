@@ -28,7 +28,7 @@ development:
     hmr: false
     inline_css: true
     client:
-      overlay: true
+      overlay: false
     compress: true
     allowed_hosts: "auto"
     pretty: true

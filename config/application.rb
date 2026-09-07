@@ -10,6 +10,7 @@ module RailsFunctionsTaskApp
   class Application < Rails::Application
     # Initialize configuration defaults for the target Rails version.
     config.load_defaults 8.1
+    config.active_job.queue_adapter = :sidekiq
     config.generators do |g|
       g.test_framework :rspec,
         fixtures: true,
