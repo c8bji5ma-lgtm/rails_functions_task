@@ -10,7 +10,13 @@ module RailsFunctionsTaskApp
   class Application < Rails::Application
     # Initialize configuration defaults for the target Rails version.
     config.load_defaults 8.1
+
+    # Active JobをSidekiqで処理する
     config.active_job.queue_adapter = :sidekiq
+
+    # Action Mailerのdeliver_laterをmailersキューに入れる
+    config.action_mailer.deliver_later_queue_name = :mailers
+
     config.generators do |g|
       g.test_framework :rspec,
         fixtures: true,
@@ -21,6 +27,7 @@ module RailsFunctionsTaskApp
         request_specs: false
       g.fixture_replacement :factory_bot, dir: "spec/factories"
     end
+
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded after loading
